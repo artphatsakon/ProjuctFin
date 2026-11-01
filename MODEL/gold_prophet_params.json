@@ -1,0 +1,6 @@
+{
+  "LOG_Y": true,
+  "ANCHOR": true,
+  "changepoint_prior_scale": 0.05,
+  "trend_damp": 0.5
+}

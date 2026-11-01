@@ -1,0 +1,9 @@
+# ไม่อัปโหลดไฟล์เหล่านี้ขึ้น GitHub
+.venv/
+__pycache__/
+config.json
+.streamlit/secrets.toml
+*_log.txt
+update_log.txt
+templates/
+static/

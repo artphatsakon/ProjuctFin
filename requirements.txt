@@ -1,0 +1,10 @@
+streamlit>=1.40
+plotly>=5.0
+pandas>=2.0
+numpy
+yfinance>=0.2.50
+prophet>=1.1
+tensorflow>=2.16
+xgboost>=2.0
+scikit-learn
+matplotlib
