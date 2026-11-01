@@ -38,24 +38,10 @@ streamlit run app.py
 - ความแม่นยำ (MAE, RMSE, MAPE, Accuracy = 100 − MAPE) วัดแบบเดียวกันทุกโมเดล คือพยากรณ์ล่วงหน้า 7 วันซ้ำหลายจุดในชุดทดสอบ 1 ปีล่าสุด และเทียบกับ Naive (เดาว่าราคาเท่าราคาล่าสุด)
 - ขั้นตอนแนะนำเมื่อจะใช้ข้อมูลใหม่: Admin → อัปเดตจาก Yahoo Finance → เทรนใหม่ทั้งหมด
 
-## เปิดเว็บออนไลน์ 24 ชม. + ดึงข้อมูลทุกเที่ยงคืน (Windows)
-ทำครั้งเดียว: คลิกขวา `setup_autostart.bat` → **Run as administrator** สคริปต์จะ
-1. ติดตั้ง cloudflared (ถ้ายังไม่มี)
-2. ตั้ง Task Scheduler: ดึงข้อมูลจาก Yahoo ทุกวัน 00:00 · เปิดเว็บ + ลิงก์ออนไลน์เองทุกครั้งที่เข้าสู่ระบบ Windows
-3. ปิดโหมด Sleep/Hibernate ตอนเสียบปลั๊ก
-4. แสดงลิงก์เว็บออนไลน์ (รูปแบบ `https://xxxx.trycloudflare.com`)
+## เว็บออนไลน์ (Streamlit Community Cloud)
+เว็บ: https://gold-oil-forecast.streamlit.app
 
-| ไฟล์ | หน้าที่ |
-|---|---|
-| `start_web.bat` | เปิดเว็บที่พอร์ต 8501 (เปิดใหม่เองถ้าหยุด) — log: `web_log.txt` |
-| `start_tunnel.bat` | เปิดลิงก์ออนไลน์ Cloudflare Tunnel — log: `tunnel_log.txt` |
-| `show_url.bat` | ดูลิงก์เว็บออนไลน์ปัจจุบัน |
-| `update_data.bat` | ดึงข้อมูลล่าสุด (Task Scheduler เรียกทุกเที่ยงคืน) — log: `update_log.txt` |
-| `remove_autostart.bat` | ยกเลิกการทำงานอัตโนมัติทั้งหมด |
-
-ข้อควรรู้: ลิงก์ trycloudflare.com จะเปลี่ยนทุกครั้งที่รีสตาร์ทเครื่อง (ดูลิงก์ใหม่ด้วย `show_url.bat`) · เครื่องต้องเปิดและเข้าสู่ระบบ Windows ไว้ตลอด · ผู้ดูแลต้องตั้งรหัสผ่าน Admin ใหม่ก่อนใช้งานครั้งแรก
-
-## Deploy ฟรีบน Streamlit Community Cloud (ไม่ต้องเปิดเครื่องทิ้งไว้)
+### วิธี deploy (ทำครั้งเดียว)
 1. **อัปโหลดโปรเจกต์ขึ้น GitHub** — ติดตั้ง GitHub Desktop → File → Add local repository → เลือกโฟลเดอร์นี้ → Publish repository
    (`.gitignore` กันไม่ให้อัปโหลด `.venv`, `config.json`, ไฟล์ log และโฟลเดอร์ Flask เก่า)
 2. **สร้างเว็บ** — เข้า share.streamlit.io → Sign in with GitHub → Create app → เลือก repo, branch `main`, ไฟล์ `app.py`
