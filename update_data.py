@@ -1,8 +1,9 @@
 """
 อัปเดตข้อมูลราคาทองคำและน้ำมันดิบจาก Yahoo Finance อัตโนมัติ (ตั้งให้ Windows Task Scheduler รันทุกวัน)
 
-รัน:  python update_data.py            อัปเดตข้อมูล CSV
-      python update_data.py --train    อัปเดตข้อมูล แล้วเทรนโมเดลใหม่ทั้งหมด (ประมาณ 10 นาที)
+รัน:  python update_data.py              อัปเดตข้อมูล CSV
+      python update_data.py --if-due     อัปเดตข้อมูล แล้วเทรนใหม่เฉพาะเมื่อครบรอบ 7 วันทำการ
+      python update_data.py --train      อัปเดตข้อมูล แล้วเทรนใหม่ทั้งหมดทันที (ประมาณ 10 นาที)
 ผลการทำงานบันทึกต่อท้ายไฟล์ update_log.txt
 """
 import argparse
@@ -27,6 +28,7 @@ def log(msg):
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--train", action="store_true", help="เทรนโมเดลใหม่ทั้งหมดหลังอัปเดตข้อมูล")
+    p.add_argument("--if-due", action="store_true", help="เทรนใหม่เฉพาะเมื่อครบรอบ 7 วันทำการ")
     args = p.parse_args()
 
     ok = True
@@ -39,14 +41,15 @@ def main():
             ok = False
             log(f"[{a}] อัปเดตไม่สำเร็จ: {e}")
 
-    if args.train and ok:
-        import model_service as ms
-        for a in ds.ASSETS:
-            for m in ms.MODELS:
-                try:
-                    mt = ms.train(a, m, log=log)
-                except Exception as e:
-                    log(f"[{a}/{m}] เทรนไม่สำเร็จ: {e}")
+    if ok and (args.train or args.if_due):
+        import train_state as ts
+        import train_all
+        if args.train or ts.is_due():
+            log("เริ่มเทรนโมเดลใหม่" + ("" if args.train else " (ครบรอบ 7 วันทำการ)"))
+            if not train_all.run(log=log):
+                ok = False
+        else:
+            log("ยังไม่ถึงรอบเทรนใหม่ ข้ามการเทรน")
     return 0 if ok else 1
 
 

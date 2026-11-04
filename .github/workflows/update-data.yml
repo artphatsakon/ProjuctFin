@@ -1,5 +1,6 @@
 # ดึงข้อมูลราคาทองคำและน้ำมันดิบจาก Yahoo Finance ทุกวันเวลา 00:00 น. (เวลาไทย) แล้วบันทึกลง CSV ใน repo
-# Streamlit Cloud จะใช้ไฟล์ CSV ใหม่อัตโนมัติ
+# เทรนโมเดลใหม่เฉพาะเมื่อครบรอบ 7 วันทำการ (ดู train_state.json) แล้วบันทึกโฟลเดอร์ MODEL ขึ้น repo
+# Streamlit Cloud จะ deploy ใหม่และใช้ไฟล์ล่าสุดอัตโนมัติ
 name: Update price data
 
 on:
@@ -13,17 +14,20 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
-      - run: pip install pandas numpy yfinance
-      - run: python update_data.py
-      - name: Commit updated CSV
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Update data and retrain if due
+        run: python update_data.py --if-due
+      - name: Commit updated data, models and train state
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add gold_15y.csv crude_oil_15y.csv
+          git add gold_15y.csv crude_oil_15y.csv train_state.json MODEL/
           git diff --cached --quiet || git commit -m "Update price data $(date -u +%F)"
           git push
