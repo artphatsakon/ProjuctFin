@@ -20,6 +20,7 @@ import plotly.graph_objects as go
 
 import data_service as ds
 import model_service as ms
+import news_service as ns
 
 st.set_page_config(page_title="พยากรณ์ราคาทองคำและน้ำมันดิบ", page_icon="📈", layout="wide")
 
@@ -155,6 +156,23 @@ def page_home():
         if info:
             st.caption(f"★ = MAPE ต่ำสุด · วัดจากการพยากรณ์ล่วงหน้า {info['horizon']} วัน จำนวน {info['windows']} รอบ "
                        f"ในชุดทดสอบ {info['test_from']} ถึง {info['test_to']} · Naive = เดาว่าราคาเท่ากับราคาล่าสุด · Accuracy = 100 − MAPE")
+
+    # ---- ข่าวสารและการวิเคราะห์ความรู้สึก (ข้อ 2.3.3.1 — ไม่ต้อง Login, ไม่ใช่ feature ของโมเดล)
+    st.subheader("ข่าวล่าสุดและการวิเคราะห์ความรู้สึก")
+    items, news_err = ns.fetch(asset)
+    if news_err:
+        st.warning(news_err)
+    elif not items:
+        st.info("ยังไม่มีข่าวจากแหล่งข้อมูล")
+    else:
+        summary = ns.summarize(items)
+        score_txt = "ไม่มีข้อมูล" if summary["score"] is None else f"{summary['score']:+.2f}"
+        st.markdown(f"ความรู้สึกรวม 7 วันล่าสุด: **{summary['label']}** "
+                    f"(คะแนน {score_txt} จากข่าว {summary['count']} ข่าว)")
+        for it in items:
+            when = f"{it['time']:%Y-%m-%d %H:%M} UTC" if it["time"] else ""
+            st.markdown(f"- [{it['title']}]({it['link']}) · {it['publisher'] or ''} · {when} · *{it['label']}*")
+    st.caption("ข่าวจาก Yahoo Finance · การวิเคราะห์ความรู้สึกนับคำศัพท์อย่างง่าย และไม่ได้ถูกใช้ในการพยากรณ์")
 
     st.divider()
     st.caption("ข้อมูลราคาจาก Yahoo Finance · ผลพยากรณ์เป็นการประมาณทางสถิติ ไม่ใช่คำแนะนำในการลงทุน")
